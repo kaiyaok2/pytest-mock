@@ -64,24 +64,24 @@ jobs:
         python -m pip install --upgrade pip
         pip install tox
 
-    # - name: Restore pytest-ranking cache
-    #   id: restore-pytest-ranking-cache
-    #   if: always()
-    #   uses: actions/cache/restore@v4
-    #   with:
-    #     path: ${{ github.workspace }}/.tox/py/.pytest_cache/v/pytest_ranking_data
-    #     key: pytest-ranking-cache-${{ runner.os }}-${{ matrix.python }}
+    - name: Restore pytest-ranking cache
+      id: restore-pytest-ranking-cache
+      if: always()
+      uses: actions/cache/restore@v4
+      with:
+        path: ${{ github.workspace }}/.tox/py/.pytest_cache/v/pytest_ranking_data
+        key: pytest-ranking-cache-${{ runner.os }}-${{ matrix.python }}
     
     - name: Test
       shell: bash
       run: |
         tox run -e ${{ matrix.tox_env }} --installpkg `find dist/*.tar.gz`
 
-    # - name: Save pytest-ranking cache
-    #   id: save-pytest-ranking-cache
-    #   if: always()
-    #   uses: actions/cache/save@v4
-    #   with:
-    #     path: ${{ github.workspace }}/.tox/py/.pytest_cache/v/pytest_ranking_data
-    #     key: pytest-ranking-cache-${{ runner.os }}-${{ matrix.python }}-${{ github.run_id }}
+    - name: Save pytest-ranking cache
+      id: save-pytest-ranking-cache
+      if: always()
+      uses: actions/cache/save@v4
+      with:
+        path: ${{ github.workspace }}/.tox/py/.pytest_cache/v/pytest_ranking_data
+        key: pytest-ranking-cache-${{ runner.os }}-${{ matrix.python }}-${{ github.run_id }}
     
