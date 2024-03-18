@@ -15,16 +15,16 @@ concurrency:
 
 jobs:
 
-  package:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Build and Check Package
-        uses: hynek/build-and-inspect-python-package@v1.5
+  # package:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: Build and Check Package
+  #       uses: hynek/build-and-inspect-python-package@v1.5
 
   test:
 
-    needs: [package]
+    # needs: [package]
 
     runs-on: ${{ matrix.os }}
 
@@ -46,13 +46,13 @@ jobs:
         #     tox_env: "norewrite"
 
     steps:
-    - uses: actions/checkout@v3
+    # - uses: actions/checkout@v3
 
-    - name: Download Package
-      uses: actions/download-artifact@v3
-      with:
-        name: Packages
-        path: dist
+    # - name: Download Package
+    #   uses: actions/download-artifact@v3
+    #   with:
+    #     name: Packages
+    #     path: dist
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -64,7 +64,23 @@ jobs:
         python -m pip install --upgrade pip
         pip install tox
 
+    - name: Restore pytest-ranking cache
+      id: restore-pytest-ranking-cache
+      if: always()
+      uses: actions/cache/restore@v4
+      with:
+        path: ${{ github.workspace }}/.tox/py312/.pytest_cache/v/pytest_ranking_data
+        key: pytest-ranking-cache-${{ runner.os }}-${{ matrix.python }}
+    
     - name: Test
       shell: bash
       run: |
         tox run -e ${{ matrix.tox_env }} --installpkg `find dist/*.tar.gz`
+
+    - name: Save pytest-ranking cache
+      id: save-pytest-ranking-cache
+      if: always()
+      uses: actions/cache/save@v4
+      with:
+        path: ${{ github.workspace }}/.tox/py312/.pytest_cache/v/pytest_ranking_data
+        key: pytest-ranking-cache-${{ runner.os }}-${{ matrix.python }}-${{ github.run_id }}
